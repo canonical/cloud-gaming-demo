@@ -1,0 +1,47 @@
+name: cloud-gaming-demo
+base: core20
+summary: Cloud gaming demo for Anbox Cloud
+description: |
+  The cloud gaming demo demonstrates how to build a cloud gaming service with Anbox Cloud (https://anbox-cloud.io/).
+confinement: strict
+version: "0.1"
+grade: stable
+
+apps:
+  web:
+    command: bin/start-web.sh
+    daemon: simple
+    plugs:
+      - home
+      - network
+      - network-bind
+    environment:
+      PATH: $SNAP/bin/:$PATH
+      PYTHONPATH: $SNAP:$SNAP/lib/python3.8/site-packages
+
+parts:
+  service:
+    plugin: python
+    source: backend
+    python-packages:
+      - wheel
+    stage-packages:
+      - ca-certificates
+    requirements:
+      - requirements.txt
+    override-build: |
+      snapcraftctl build
+      cp -r service $SNAPCRAFT_PART_INSTALL/service
+    prime:
+      - bin
+      - lib/python*
+      - service
+      - -service/__pycache__
+
+  scripts:
+    source: .
+    plugin: dump
+    organize:
+      scripts/start-web.sh: bin/start-web.sh
+    prime:
+      - bin/start-web.sh
