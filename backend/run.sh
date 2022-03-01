@@ -22,4 +22,8 @@ fi
 . ./venv/bin/activate
 pip install -r requirements.txt
 
-env python service/service.py
+exec talisker.gunicorn.gevent \
+    --chdir "$PWD" \
+    --bind "0.0.0.0:8002" \
+    --worker-class gevent \
+    service.service:app
