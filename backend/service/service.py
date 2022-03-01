@@ -14,14 +14,14 @@
 # limitations under the License.
 #
 
-from flask import Flask, jsonify
+from re import I
+from flask import Flask, jsonify, request
 from requests import Session
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 from service import config
-from service.gateway import GatwayAPI
-
+from service.gateway import GatewayAPI
 
 app = Flask(__name__)
 
@@ -39,7 +39,7 @@ gateway_api_url = config.get("gateway-url", None)
 gateway_api_token = config.get("gateway-token", None)
 gateway_enabled = bool(gateway_api_url and gateway_api_token)
 
-gateway = GatwayAPI(
+gateway = GatewayAPI(
     gateway_api_url,
     internal_session,
     gateway_api_token
@@ -54,11 +54,48 @@ def api_1_0_sessions_post():
     if not gateway_enabled:
         return render_error_response("no gateway connected", 503)
 
-    return jsonify({}), 200
+    data = request.json
+    if not data:
+        return render_error_response("invalid input", 400)
+
+    if not 'game' in data or len(data['game']) == 0:
+        return render_error_response("invalid game selected", 400)
+
+    req = {
+        "app": data['game'],
+        "joinable": False,
+        "screen": {
+            "width": 1280,
+            "height": 720,
+            "fps": 60,
+        }
+    }
+
+    resp = gateway.create_session(req)
+
+    if not 'status_code' in resp or resp['status_code'] != 201:
+        return render_error_response("failed to create session", 500)
+
+    return jsonify(resp["metadata"]), 200
 
 @app.route('/1.0/games', methods=['GET'])
 def api_1_0_games_get():
     if not gateway_enabled:
         return render_error_response("no gateway connected", 503)
 
-    return jsonify({}), 200
+    resp = gateway.get_applications()
+
+    if not 'status_code' in resp or resp['status_code'] != 200:
+        return render_error_response("failed to communicate with gateway", 500)
+
+    if not 'metadata' in resp:
+        return render_error_response("received invalid response from gateway", 500)
+
+    metadata = resp['metadata']
+    apps = []
+    for app in metadata:
+        if not 'name' in app:
+            continue
+        apps.append(app['name'])
+
+    return jsonify(apps), 200

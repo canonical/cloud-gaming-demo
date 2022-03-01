@@ -17,7 +17,7 @@
 from typing import Union
 from requests import Session
 
-class GatwayAPI:
+class GatewayAPI:
     def __init__(self, base_url: str, session: Session, token: str):
         self.base_url = base_url
         self.session = session
