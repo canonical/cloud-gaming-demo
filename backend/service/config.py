@@ -24,7 +24,7 @@ def load_config(path=None):
     if not path and os.getenv("SNAP_COMMON"):
         path = "{}/service/config.yaml".format(os.getenv("SNAP_COMMON"))
 
-    if not path:
+    if not path or not os.path.exists(path):
         return {}
 
     with open(path, "r") as config_file:

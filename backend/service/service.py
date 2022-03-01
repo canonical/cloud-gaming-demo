@@ -1,4 +1,3 @@
-import json
 #
 # Copyright 2022 Canonical Ltd.
 #
@@ -16,12 +15,13 @@ import json
 #
 
 from flask import Flask, jsonify
-from gateway import GatwayAPI
 from requests import Session
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
-import config
+from service import config
+from service.gateway import GatwayAPI
+
 
 app = Flask(__name__)
 
@@ -62,6 +62,3 @@ def api_1_0_games_get():
         return render_error_response("no gateway connected", 503)
 
     return jsonify({}), 200
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8002)
