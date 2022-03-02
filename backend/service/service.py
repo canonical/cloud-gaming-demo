@@ -23,7 +23,10 @@ from service import config
 from service.gateway import GatwayAPI
 
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_folder="./static",
+)
 
 retry_strategy = Retry(
     total=3,
@@ -45,9 +48,11 @@ gateway = GatwayAPI(
     gateway_api_token
 )
 
+
 def render_error_response(msg, code):
     resp = {"error_msg": msg}
     return jsonify(resp), code
+
 
 @app.route('/1.0/sessions/', methods=['POST'])
 def api_1_0_sessions_post():
@@ -56,9 +61,18 @@ def api_1_0_sessions_post():
 
     return jsonify({}), 200
 
+
 @app.route('/1.0/games', methods=['GET'])
 def api_1_0_games_get():
     if not gateway_enabled:
         return render_error_response("no gateway connected", 503)
 
     return jsonify({}), 200
+
+@app.route('/')
+def root_file():
+    return app.send_static_file('index.html')
+
+@app.route('/<path:filename>')
+def static_file(filename):
+    return app.send_static_file(filename)
