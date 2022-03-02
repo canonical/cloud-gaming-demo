@@ -1,5 +1,5 @@
 name: cloud-gaming-demo
-base: core20
+base: core18
 summary: Cloud gaming demo for Anbox Cloud
 description: |
   The cloud gaming demo demonstrates how to build a cloud gaming service with Anbox Cloud (https://anbox-cloud.io/).
@@ -17,7 +17,8 @@ apps:
       - network-bind
     environment:
       PATH: $SNAP/bin/:$PATH
-      PYTHONPATH: $SNAP:$SNAP/lib/python3.8/site-packages
+      PYTHONPATH: $SNAP:$SNAP/lib/python3.6/site-packages
+    extensions: [flutter-master]
 
 parts:
   service:
@@ -45,3 +46,13 @@ parts:
       scripts/start-web.sh: bin/start-web.sh
     prime:
       - bin/start-web.sh
+
+  ui:
+    source: ui
+    plugin: flutter
+    after: [ service ]
+    flutter-target: lib/main.dart
+    override-build: |
+      flutter build web
+      mkdir -p $SNAPCRAFT_PART_INSTALL/service/static
+      cp -r build/web/* $SNAPCRAFT_PART_INSTALL/service/static
