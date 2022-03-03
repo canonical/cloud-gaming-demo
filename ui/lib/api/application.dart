@@ -17,5 +17,6 @@
 class Application {
   String name = '';
   String background = '';
-  Application({required this.name, required this.background});
+  String description = '';
+  Application({required this.name, required this.background, this.description=''});
 }
