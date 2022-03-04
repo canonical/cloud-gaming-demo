@@ -20,12 +20,14 @@ class ApplicationCard extends StatelessWidget {
   final String name;
   final String backgroundUrl;
   final bool showPlayButton;
+  final Function() onPlay;
 
   const ApplicationCard({
     Key? key,
     required this.name,
     required this.backgroundUrl,
-    this.showPlayButton=true
+    this.showPlayButton=true,
+    required this.onPlay
   }) : super(key: key);
 
   @override
@@ -80,7 +82,7 @@ class ApplicationCard extends StatelessWidget {
                                 color: Colors.white70,
                                 icon: const Icon(Icons.play_circle_outline),
                                 tooltip: 'Play $name',
-                                onPressed: () {},
+                                onPressed: onPlay,
                               ),
                             ],
                           )
