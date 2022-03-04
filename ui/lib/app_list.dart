@@ -21,8 +21,9 @@ import 'card.dart';
 
 class AppList extends StatelessWidget {
   final List<Application> apps;
+  final Function() onPlay;
 
-  const AppList({Key? key, required this.apps}) : super(key: key);
+  const AppList({Key? key, required this.apps, required this.onPlay}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,11 @@ class AppList extends StatelessWidget {
                   for (var app in apps) Container(
                     margin: const EdgeInsets.all(10),
                     constraints: isLargeViewport ? const BoxConstraints(maxWidth: 330, maxHeight: 200) : const BoxConstraints(maxHeight: 300),
-                    child: ApplicationCard(name: app.name, backgroundUrl: app.background),
+                    child: ApplicationCard(
+                      name: app.name,
+                      backgroundUrl: app.background,
+                      onPlay: onPlay
+                    ),
                   )
                 ],
               ),

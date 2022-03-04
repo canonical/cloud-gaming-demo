@@ -14,7 +14,6 @@
 // limitations under the License.
 //
 
-
 import 'package:cloud_gaming_demo/card.dart';
 import 'package:flutter/material.dart';
 
@@ -22,10 +21,14 @@ class FeaturedApp extends StatelessWidget {
   final String name;
   final String backgroundUrl;
   final String description;
+  final Function() onPlay;
 
-  const FeaturedApp(
-      {Key? key, required this.name, required this.backgroundUrl, required this.description})
-      : super(key: key);
+  const FeaturedApp({Key? key,
+    required this.name,
+    required this.backgroundUrl,
+    required this.description,
+    required this.onPlay
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +55,12 @@ class FeaturedApp extends StatelessWidget {
                     children: [
                       Expanded(
                           flex: 3,
-                          child: ApplicationCard(name: name, backgroundUrl: backgroundUrl, showPlayButton: false)
+                          child: ApplicationCard(
+                            name: name,
+                            backgroundUrl: backgroundUrl,
+                            showPlayButton: false,
+                            onPlay: onPlay,
+                          )
                       ),
                       Expanded(
                           flex: isLargeViewport ? 2 : 3,
@@ -90,7 +98,7 @@ class FeaturedApp extends StatelessWidget {
                                               primary: Colors.white,
                                               textStyle: const TextStyle(fontSize: 20),
                                             ),
-                                            onPressed: () {},
+                                            onPressed: onPlay,
                                             child: const Text('Play now'),
                                           ),
                                         ],
