@@ -21,7 +21,7 @@ class FeaturedApp extends StatelessWidget {
   final String name;
   final String backgroundUrl;
   final String description;
-  final Function() onPlay;
+  final Function(String name) onPlay;
 
   const FeaturedApp({Key? key,
     required this.name,
@@ -98,7 +98,7 @@ class FeaturedApp extends StatelessWidget {
                                               primary: Colors.white,
                                               textStyle: const TextStyle(fontSize: 20),
                                             ),
-                                            onPressed: onPlay,
+                                            onPressed: () => onPlay(name),
                                             child: const Text('Play now'),
                                           ),
                                         ],

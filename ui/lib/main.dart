@@ -14,13 +14,39 @@
 // limitations under the License.
 //
 
+import 'dart:convert';
+import 'dart:js';
+
 import 'package:cloud_gaming_demo/homepage.dart';
-import 'package:cloud_gaming_demo/sdk/connector.dart';
 import 'package:cloud_gaming_demo/sdk/sdk.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:js/js_util.dart' as js;
+import 'dart:io';
 
 void main() {
   runApp(const CloudGamingDemo());
+}
+
+Future<JsObject> createSession(String game) async {
+  final url = Uri.parse(Uri.base.origin.toString() + '/1.0/sessions');
+  final body = json.encode({'game': game});
+  Map<String,String> headers = {
+    'Content-type' : 'application/json',
+  };
+
+  final response = await http.post(url, body: body, headers: headers);
+  if (response.statusCode == 200) {
+    final metadata = jsonDecode(response.body);
+    Map<String, dynamic> sessionInfo = {
+      'id': metadata['id'],
+      'websocket': metadata['url'],
+      'stunServers': metadata['stun_servers']
+    };
+    return JsObject.jsify(sessionInfo);
+  } else {
+    throw Exception('Failed to create session');
+  }
 }
 
 class CloudGamingDemo extends StatelessWidget {
@@ -46,21 +72,30 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  startStreaming() {
-    var connector = GatewayConnector(ConnectorOptions(
-        url: 'https://anbox.example.com',
-        authToken: 'INSERT GATEWAY HERE',
-        session: Session(app: 'com.bar.foo')
-    ));
+  startStreaming(String game) {
+    // FIXME: ideally, we should call the createSession function
+    //        in the connector.connect JS function, so the connector
+    //        can fetch the sesssion info from the backend on demand.
+    //        However since the Future<T> is not primitive type,
+    //        returning Future<T> type leads to a DartObject JS
+    //        object received on the JS SDK side and fails in
+    //        parsing session info. Hence we should always give
+    //        a JsObject rather than Future<JsObject> back from
+    //        dart to JS side.
+    createSession(game).then((JsObject sessionInfo) {
+      Map<String, dynamic> options = {
+        'targetElement': 'anbox-cloud-stream',
+        'fullscreen': true,
+        'connector': {
+          'connect': () { return sessionInfo; },
+          'disconnect': () {}
+        }
+      };
 
-    var stream = AnboxStream(AnboxStreamOptions(
-      connector: connector,
-      targetElement: "anbox-cloud-stream",
-      fullscreen: true,
-    ));
-
-    stream.connect();
-    stream.requestFullscreen();
+      var stream = JsObject(context['AnboxStream'], [JsObject.jsify(options)]);
+      stream.callMethod('connect', []);
+      stream.callMethod('requestFullscreen', []);
+    });
   }
 
   @override

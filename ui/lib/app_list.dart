@@ -21,7 +21,7 @@ import 'card.dart';
 
 class AppList extends StatelessWidget {
   final List<Application> apps;
-  final Function() onPlay;
+  final Function(String name) onPlay;
 
   const AppList({Key? key, required this.apps, required this.onPlay}) : super(key: key);
 
@@ -41,7 +41,7 @@ class AppList extends StatelessWidget {
                     child: ApplicationCard(
                       name: app.name,
                       backgroundUrl: app.background,
-                      onPlay: onPlay
+                      onPlay: onPlay,
                     ),
                   )
                 ],

@@ -22,8 +22,16 @@ fi
 . ./venv/bin/activate
 pip install -r requirements.txt
 
+EXTRA_ARGS=
+
+if [ -e "$PWD"/tls/app.crt ] && [ -e "$PWD"/tls/app.key ]; then
+    EXTRA_ARGS="$EXTRA_ARGS --keyfile $PWD/tls/app.key --certfile $PWD/tls/app.crt"
+    EXTRA_ARGS="$EXTRA_ARGS --ssl-version=TLSv1_2"
+fi
+
 exec talisker.gunicorn.gevent \
     --chdir "$PWD" \
     --bind "0.0.0.0:8002" \
     --worker-class gevent \
+    $EXTRA_ARGS \
     service.service:app

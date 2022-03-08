@@ -20,7 +20,7 @@ class ApplicationCard extends StatelessWidget {
   final String name;
   final String backgroundUrl;
   final bool showPlayButton;
-  final Function() onPlay;
+  final Function(String name) onPlay;
 
   const ApplicationCard({
     Key? key,
@@ -82,7 +82,7 @@ class ApplicationCard extends StatelessWidget {
                                 color: Colors.white70,
                                 icon: const Icon(Icons.play_circle_outline),
                                 tooltip: 'Play $name',
-                                onPressed: onPlay,
+                                onPressed: () => onPlay(name)
                               ),
                             ],
                           )
