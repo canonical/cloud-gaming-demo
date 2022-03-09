@@ -22,19 +22,19 @@ import 'package:cloud_gaming_demo/featured.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-Future<List<Application>> fetchApps() async {
+Future<List<Application>> fetchApps(List<String> ids) async {
   final response = await http
       .get(Uri.parse(Uri.base.origin.toString() + "/1.0/games"));
   if (response.statusCode == 200) {
-    List<String> applist = jsonDecode(response.body);
+    List<String> applist = jsonDecode(response.body).where((i) => ids.contains(i));
     return List<Application>.from(applist.map((v) => Application.fromString(v)));
   } else {
-    throw Exception('Failed to load applications');
+    throw Error('Failed to load games');
   }
 }
 
 class Homepage extends StatefulWidget {
-  final Function(String name) onPlay;
+  final Function(String id) onPlay;
 
   const Homepage({Key? key, required this.onPlay}) : super(key: key);
 
@@ -45,16 +45,18 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   late Future<List<Application>> futureApps;
+  final gameids = ['bombsquad', 'bbr2', 'mindustry', 'minetest'];
 
   @override
   void initState() {
     super.initState();
-    futureApps = fetchApps();
+    futureApps = fetchApps(gameids);
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return LayoutBuilder(
+     builder: (context, constraints) => ListView(
       children: [
         Container(
           decoration: const BoxDecoration(
@@ -68,6 +70,9 @@ class _HomepageState extends State<Homepage> {
               ],
             ),
           ),
+          constraints: BoxConstraints(
+            minHeight: constraints.maxHeight,
+          ),
           child: Center(
             child: FutureBuilder<List<Application>>(
               future: futureApps,
@@ -75,7 +80,18 @@ class _HomepageState extends State<Homepage> {
                 if (snapshot.hasData) {
                   final apps = snapshot.data;
                   if(apps!.isEmpty){
-                    return Text('No app is installed');
+                  return Container(
+                    margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                       'No game is installed',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 26,
+                          color: Colors.white,
+                        )
+                      )
+                    );
                   }
 
                   return Container(
@@ -85,6 +101,7 @@ class _HomepageState extends State<Homepage> {
                     child: Column(
                       children: [
                         FeaturedApp(
+                          id: apps[0].id,
                           name: apps[0].name,
                           backgroundUrl: apps[0].background,
                           description: apps[0].description,
@@ -98,7 +115,7 @@ class _HomepageState extends State<Homepage> {
                               Container(
                                 margin: const EdgeInsets.all(20),
                                 child: const Text(
-                                  'Available applications',
+                                  'Available games',
                                   style: TextStyle(
                                     fontSize: 26,
                                     color: Colors.white,
@@ -113,7 +130,18 @@ class _HomepageState extends State<Homepage> {
                     ),
                   );
                 } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
+                  return Container(
+                    margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                    alignment: Alignment.center,
+                    child: Text(
+                        '${snapshot.error}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 26,
+                          color: Colors.white,
+                        )
+                      )
+                    );
                 }
                 return const CircularProgressIndicator();
               },
@@ -121,6 +149,6 @@ class _HomepageState extends State<Homepage> {
           ),
         )
       ],
-    );
+    ));
   }
 }

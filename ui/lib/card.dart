@@ -17,13 +17,15 @@
 import 'package:flutter/material.dart';
 
 class ApplicationCard extends StatelessWidget {
+  final String id;
   final String name;
   final String backgroundUrl;
   final bool showPlayButton;
-  final Function(String name) onPlay;
+  final Function(String id) onPlay;
 
   const ApplicationCard({
     Key? key,
+    required this.id,
     required this.name,
     required this.backgroundUrl,
     this.showPlayButton=true,
@@ -82,7 +84,7 @@ class ApplicationCard extends StatelessWidget {
                                 color: Colors.white70,
                                 icon: const Icon(Icons.play_circle_outline),
                                 tooltip: 'Play $name',
-                                onPressed: () => onPlay(name)
+                                onPressed: () => onPlay(id)
                               ),
                             ],
                           )
