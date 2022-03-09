@@ -19,6 +19,7 @@ import 'dart:convert';
 import 'package:cloud_gaming_demo/api/application.dart';
 import 'package:cloud_gaming_demo/app_list.dart';
 import 'package:cloud_gaming_demo/featured.dart';
+import 'package:cloud_gaming_demo/exception.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -29,7 +30,7 @@ Future<List<Application>> fetchApps(List<String> ids) async {
     List<String> applist = jsonDecode(response.body).where((i) => ids.contains(i));
     return List<Application>.from(applist.map((v) => Application.fromString(v)));
   } else {
-    throw Error('Failed to load games');
+    throw HttpException('Failed to load games');
   }
 }
 

@@ -45,7 +45,7 @@ Future<JsObject> createSession(String game) async {
     };
     return JsObject.jsify(sessionInfo);
   } else {
-    throw Exception('Failed to create session');
+    throw HttpException('Failed to create session');
   }
 }
 
@@ -73,38 +73,45 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   startStreaming(String game) {
-    // FIXME: ideally, we should call the createSession function
-    //        in the connector.connect JS function, so the connector
-    //        can fetch the sesssion info from the backend on demand.
-    //        However since the Future<T> is not primitive type,
-    //        returning Future<T> type leads to a DartObject JS
-    //        object received on the JS SDK side and fails in
-    //        parsing session info. Hence we should always give
-    //        a JsObject rather than Future<JsObject> back from
-    //        dart to JS side.
-    createSession(game).then((JsObject sessionInfo) {
-      Map<String, dynamic> options = {
-        'targetElement': 'anbox-cloud-stream',
-        'fullscreen': true,
-        'connector': {
-          'connect': () { return sessionInfo; },
-          'disconnect': () {}
-        }
-      };
-
-      var stream = JsObject(context['AnboxStream'], [JsObject.jsify(options)]);
-      stream.callMethod('connect', []);
-      stream.callMethod('requestFullscreen', []);
-    });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext buildContext) {
     return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
+      builder: (BuildContext buildContext, BoxConstraints constraints) {
         return Scaffold(
           backgroundColor: const Color(0xff191d26),
-          body: Homepage(onPlay: startStreaming),
+          body: Homepage(onPlay: (String game) {
+            // FIXME: ideally, we should call the createSession function
+            //        in the connector.connect JS function, so the connector
+            //        can fetch the sesssion info from the backend on demand.
+            //        However since the Future<T> is not primitive type,
+            //        returning Future<T> type leads to a DartObject JS
+            //        object received on the JS SDK side and fails in
+            //        parsing session info. Hence we should always give
+            //        a JsObject rather than Future<JsObject> back from
+            //        dart to JS side.
+            createSession(game).then((JsObject sessionInfo) {
+              Map<String, dynamic> options = {
+                'targetElement': 'anbox-cloud-stream',
+                'fullscreen': true,
+                'connector': {
+                  'connect': () { return sessionInfo; },
+                  'disconnect': () {}
+                }
+              };
+
+              var stream = JsObject(context['AnboxStream'], [JsObject.jsify(options)]);
+              stream.callMethod('connect', []);
+              stream.callMethod('requestFullscreen', []);
+            }).catchError((e) {
+              final scaffold = ScaffoldMessenger.of(buildContext);
+              scaffold.showSnackBar(
+                SnackBar(
+                  content: Text('${e.message}'),
+              ));
+            });
+          }),
         );
       }
     );
