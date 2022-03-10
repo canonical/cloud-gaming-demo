@@ -104,6 +104,19 @@ class _MainPageState extends State<MainPage> {
               var stream = JsObject(context['AnboxStream'], [JsObject.jsify(options)]);
               stream.callMethod('connect', []);
               stream.callMethod('requestFullscreen', []);
+
+              void fullScreenChangedCallback(JsObject ev) {
+                var doc = JsObject.fromBrowserObject(context['document']);
+                if(!doc['webkitIsFullScreen'] &&
+                   !doc['fullscreenchange'] &&
+                   !doc['mozfullscreenchange']){
+                    stream.callMethod('disconnect', []);
+                }
+              }
+
+              var cb = allowInterop(fullScreenChangedCallback);
+              var window = JsObject.fromBrowserObject(context['window']);
+              window.callMethod('addEventListener', ['fullscreenchange', cb]);
             }).catchError((e) {
               final scaffold = ScaffoldMessenger.of(buildContext);
               scaffold.showSnackBar(
