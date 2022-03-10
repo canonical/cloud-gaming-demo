@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-import 'package:cloud_gaming_demo/sdk/connector.dart';
 import 'package:js/js.dart';
+import 'dart:js';
 
 @JS('window.AnboxStream')
 class AnboxStream {
@@ -29,7 +29,7 @@ class AnboxStream {
 @anonymous
 class AnboxStreamOptions {
   external factory AnboxStreamOptions({
-    GatewayConnector connector,
+    JsObject connector,
     String targetElement,
     bool fullscreen,
     String deviceType,

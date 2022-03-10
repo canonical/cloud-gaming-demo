@@ -17,8 +17,10 @@
 import os
 import yaml
 
+
 class Throw:
     pass
+
 
 def load_config(path=None):
     if not path and os.getenv("SNAP_COMMON"):
@@ -30,6 +32,7 @@ def load_config(path=None):
     with open(path, "r") as config_file:
         return yaml.load(config_file, Loader=yaml.Loader)
 
+
 def get(key, default=Throw):
     if key in _cfg:
         return _cfg[key]
@@ -38,6 +41,7 @@ def get(key, default=Throw):
         raise Exception(f"Configuration option '{key}' not present")
 
     return default
+
 
 path = os.getenv("CONFIG_PATH")
 _cfg = load_config(path)

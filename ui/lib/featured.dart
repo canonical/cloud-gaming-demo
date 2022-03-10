@@ -18,12 +18,14 @@ import 'package:cloud_gaming_demo/card.dart';
 import 'package:flutter/material.dart';
 
 class FeaturedApp extends StatelessWidget {
+  final String id;
   final String name;
   final String backgroundUrl;
   final String description;
-  final Function() onPlay;
+  final Function(String id) onPlay;
 
   const FeaturedApp({Key? key,
+    required this.id,
     required this.name,
     required this.backgroundUrl,
     required this.description,
@@ -56,6 +58,7 @@ class FeaturedApp extends StatelessWidget {
                       Expanded(
                           flex: 3,
                           child: ApplicationCard(
+                            id: id,
                             name: name,
                             backgroundUrl: backgroundUrl,
                             showPlayButton: false,
@@ -98,7 +101,7 @@ class FeaturedApp extends StatelessWidget {
                                               primary: Colors.white,
                                               textStyle: const TextStyle(fontSize: 20),
                                             ),
-                                            onPressed: onPlay,
+                                            onPressed: () => onPlay(id),
                                             child: const Text('Play now'),
                                           ),
                                         ],

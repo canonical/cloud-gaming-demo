@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 
-from re import I
 from flask import Flask, jsonify, request
 from requests import Session
 from requests.adapters import HTTPAdapter
@@ -63,7 +62,7 @@ def api_1_0_sessions_post():
     if not data:
         return render_error_response("invalid input", 400)
 
-    if not 'game' in data or len(data['game']) == 0:
+    if 'game' not in data or len(data['game']) == 0:
         return render_error_response("invalid game selected", 400)
 
     req = {
@@ -78,7 +77,7 @@ def api_1_0_sessions_post():
 
     resp = gateway.create_session(req)
 
-    if not 'status_code' in resp or resp['status_code'] != 201:
+    if 'status_code' not in resp or resp['status_code'] != 201:
         return render_error_response("failed to create session", 500)
 
     return jsonify(resp["metadata"]), 200
@@ -91,16 +90,16 @@ def api_1_0_games_get():
 
     resp = gateway.get_applications()
 
-    if not 'status_code' in resp or resp['status_code'] != 200:
+    if 'status_code' not in resp or resp['status_code'] != 200:
         return render_error_response("failed to communicate with gateway", 500)
 
-    if not 'metadata' in resp:
+    if 'metadata' not in resp:
         return render_error_response("received invalid response from gateway", 500)
 
     metadata = resp['metadata']
     apps = []
     for app in metadata:
-        if not 'name' in app:
+        if 'name' not in app:
             continue
         apps.append(app['name'])
 
@@ -110,6 +109,7 @@ def api_1_0_games_get():
 @app.route('/')
 def root_file():
     return app.send_static_file('index.html')
+
 
 @app.route('/<path:filename>')
 def static_file(filename):

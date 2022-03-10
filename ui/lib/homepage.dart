@@ -13,25 +13,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_gaming_demo/api/application.dart';
 import 'package:cloud_gaming_demo/app_list.dart';
 import 'package:cloud_gaming_demo/featured.dart';
+import 'package:cloud_gaming_demo/exception.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class Homepage extends StatelessWidget {
-  final Function() onPlay;
+Future<List<Application>> fetchApps(List<String> ids) async {
+  final response = await http
+      .get(Uri.parse(Uri.base.origin.toString() + "/1.0/games"));
+  if (response.statusCode == 200) {
+    List<String> applist = jsonDecode(response.body).where((i) => ids.contains(i));
+    return List<Application>.from(applist.map((v) => Application.fromString(v)));
+  } else {
+    throw HttpException('Failed to load games');
+  }
+}
+
+class Homepage extends StatefulWidget {
+  final Function(String id) onPlay;
 
   const Homepage({Key? key, required this.onPlay}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    List<Application> apps = [
-      Application(name: 'Beach Buggy Racing 2', background: 'lib/assets/beachbuggy2_bg.jpeg', description: 'Join the Beach Buggy Racing League and compete against drivers and cars from around the world. Race through Egyptian pyramids, dragon-infested castles, pirate ship wrecks, and experimental alien bio-labs. Collect and upgrade an arsenal of fun and wacky Powerups. Recruit new drivers, assemble a garage full of cars and race your way to the top of the League.'),
-      Application(name: 'Bombsquad', background: 'lib/assets/bombsquad_bg.jpeg'),
-    ];
+  _HomepageState createState() => _HomepageState();
 
-    return ListView(
+}
+
+class _HomepageState extends State<Homepage> {
+  late Future<List<Application>> futureApps;
+  final gameids = ['bombsquad', 'bbr2', 'mindustry', 'minetest'];
+
+  @override
+  void initState() {
+    super.initState();
+    futureApps = fetchApps(gameids);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+     builder: (context, constraints) => ListView(
       children: [
         Container(
           decoration: const BoxDecoration(
@@ -45,46 +71,85 @@ class Homepage extends StatelessWidget {
               ],
             ),
           ),
+          constraints: BoxConstraints(
+            minHeight: constraints.maxHeight,
+          ),
           child: Center(
-            child:
-            Container(
-              margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-              constraints: const BoxConstraints(maxWidth: 1100),
-              alignment: Alignment.center,
-              child: Column(
-                children: [
-                  FeaturedApp(
-                    name: apps[0].name,
-                    backgroundUrl: apps[0].background,
-                    description: apps[0].description,
-                    onPlay: onPlay
-                  ),
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(0, 60, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+            child: FutureBuilder<List<Application>>(
+              future: futureApps,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final apps = snapshot.data;
+                  if(apps!.isEmpty){
+                  return Container(
+                    margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                       'No game is installed',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 26,
+                          color: Colors.white,
+                        )
+                      )
+                    );
+                  }
+
+                  return Container(
+                    margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                    constraints: const BoxConstraints(maxWidth: 1100),
+                    alignment: Alignment.center,
+                    child: Column(
                       children: [
+                        FeaturedApp(
+                          id: apps[0].id,
+                          name: apps[0].name,
+                          backgroundUrl: apps[0].background,
+                          description: apps[0].description,
+                          onPlay: widget.onPlay
+                        ),
                         Container(
-                          margin: const EdgeInsets.all(20),
-                          child: const Text(
-                            'Available applications',
-                            style: TextStyle(
-                              fontSize: 26,
-                              color: Colors.white,
-                            ),
+                          margin: const EdgeInsets.fromLTRB(0, 60, 0, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.all(20),
+                                child: const Text(
+                                  'Available games',
+                                  style: TextStyle(
+                                    fontSize: 26,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        AppList(apps: apps, onPlay: widget.onPlay)
                       ],
                     ),
-                  ),
-                  AppList(apps: apps, onPlay: onPlay)
-                ],
-              ),
-            ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Container(
+                    margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                    alignment: Alignment.center,
+                    child: Text(
+                        '${snapshot.error}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 26,
+                          color: Colors.white,
+                        )
+                      )
+                    );
+                }
+                return const CircularProgressIndicator();
+              },
+            )
           ),
         )
       ],
-    );
+    ));
   }
-
 }
