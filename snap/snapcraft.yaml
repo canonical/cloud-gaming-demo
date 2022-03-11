@@ -53,6 +53,6 @@ parts:
     after: [ service ]
     flutter-target: lib/main.dart
     override-build: |
-      flutter build web
+      flutter build web --base-href '/demo/'
       mkdir -p $SNAPCRAFT_PART_INSTALL/service/static
       cp -r build/web/* $SNAPCRAFT_PART_INSTALL/service/static
