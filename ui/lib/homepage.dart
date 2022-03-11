@@ -25,7 +25,7 @@ import 'package:http/http.dart' as http;
 
 Future<List<Application>> fetchApps(List<String> ids) async {
   final response = await http
-      .get(Uri.parse(Uri.base.origin.toString() + "/1.0/games"));
+      .get(Uri.parse(Uri.base.toString() + "1.0/games"));
   if (response.statusCode == 200) {
     List<String> applist = jsonDecode(response.body).where((i) => ids.contains(i));
     return List<Application>.from(applist.map((v) => Application.fromString(v)));
