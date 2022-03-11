@@ -20,16 +20,18 @@ import 'dart:js';
 import 'package:cloud_gaming_demo/homepage.dart';
 import 'package:cloud_gaming_demo/sdk/sdk.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:http/http.dart' as http;
 import 'package:js/js_util.dart' as js;
 import 'dart:io';
 
 void main() {
+  setUrlStrategy(PathUrlStrategy());
   runApp(const CloudGamingDemo());
 }
 
 Future<JsObject> createSession(String game) async {
-  final url = Uri.parse(Uri.base.origin.toString() + '/1.0/sessions');
+  final url = Uri.parse(Uri.base.toString() + '1.0/sessions/');
   final body = json.encode({'game': game});
   Map<String,String> headers = {
     'Content-type' : 'application/json',
