@@ -31,9 +31,7 @@ SERVICE_NAME=cloud-gaming-demo
 DEMO_SNAP_COMMON_DIR="/var/snap/cloud-gaming-demo/common"
 APPLIANCE_SNAP_COMMON_DIR="/var/snap/anbox-cloud-appliance/common"
 
-GAMES="minetest bombsquad mindustry"
-MINETEST_DOWNLOAD_URL="https://github.com/minetest/minetest/releases/download/5.5.0/app-arm64-v8a-release.apk"
-MINETEST_PKG_ARCH="arm64"
+GAMES="bombsquad mindustry"
 BOMBSQUAD_DOWNLOAD_URL="https://files.ballistica.net/bombsquad/builds/BombSquad_Android_Generic_1.6.10.apk"
 BOMBSQUAD_PKG_ARCH="universal"
 MINDUSTRY_DOWNLOAD_URL="https://f-droid.org/repo/io.anuke.mindustry_104.apk"
