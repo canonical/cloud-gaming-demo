@@ -57,6 +57,7 @@ class CloudGamingDemo extends StatelessWidget {
     return MaterialApp(
       title: 'Anbox Cloud - Cloud Gaming Demo',
       theme: ThemeData(
+        fontFamily: 'Ubuntu',
         primarySwatch: Colors.blue,
       ),
       home: const MainPage(),
