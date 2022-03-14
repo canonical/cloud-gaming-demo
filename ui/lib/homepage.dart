@@ -56,8 +56,7 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-     builder: (context, constraints) => ListView(
+    return ListView(
       children: [
         Container(
           decoration: const BoxDecoration(
@@ -71,28 +70,15 @@ class _HomepageState extends State<Homepage> {
               ],
             ),
           ),
-          constraints: BoxConstraints(
-            minHeight: constraints.maxHeight,
-          ),
           child: Center(
             child: FutureBuilder<List<Application>>(
               future: futureApps,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final apps = snapshot.data;
-                  if(apps!.isEmpty){
-                  return Container(
-                    margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                       'No game is installed',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 26,
-                          color: Colors.white,
-                        )
-                      )
-                    );
+
+                  if(apps!.isEmpty) {
+                    return const NoAppsPlaceholder();
                   }
 
                   return Container(
@@ -137,7 +123,7 @@ class _HomepageState extends State<Homepage> {
                     child: Text(
                         '${snapshot.error}',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 26,
                           color: Colors.white,
                         )
@@ -150,6 +136,27 @@ class _HomepageState extends State<Homepage> {
           ),
         )
       ],
-    ));
+    );
   }
+}
+
+class NoAppsPlaceholder extends StatelessWidget {
+  const NoAppsPlaceholder({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0, 80, 0, 0),
+      alignment: Alignment.center,
+      child: const Text(
+          'No game available',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 26,
+            color: Colors.white,
+          )
+      )
+    );
+  }
+
 }

@@ -74,7 +74,7 @@ class FeaturedApp extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(name, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white)),
-                                Text(description, style: const TextStyle(fontSize: 16, color: Colors.white, letterSpacing: 1.2)),
+                                Text(description, style: const TextStyle(fontSize: 17, color: Colors.white70)),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [

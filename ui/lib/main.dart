@@ -18,11 +18,9 @@ import 'dart:convert';
 import 'dart:js';
 
 import 'package:cloud_gaming_demo/homepage.dart';
-import 'package:cloud_gaming_demo/sdk/sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:http/http.dart' as http;
-import 'package:js/js_util.dart' as js;
 import 'dart:io';
 
 void main() {
@@ -59,6 +57,7 @@ class CloudGamingDemo extends StatelessWidget {
     return MaterialApp(
       title: 'Anbox Cloud - Cloud Gaming Demo',
       theme: ThemeData(
+        fontFamily: 'Ubuntu',
         primarySwatch: Colors.blue,
       ),
       home: const MainPage(),
@@ -97,6 +96,10 @@ class _MainPageState extends State<MainPage> {
               Map<String, dynamic> options = {
                 'targetElement': 'anbox-cloud-stream',
                 'fullscreen': true,
+                'screen': {
+                  'width': 1280,
+                  'height': 720
+                },
                 'connector': {
                   'connect': () { return sessionInfo; },
                   'disconnect': () {}
@@ -127,6 +130,12 @@ class _MainPageState extends State<MainPage> {
               ));
             });
           }),
+          bottomNavigationBar: const SizedBox(
+            child: Center(
+              child: Text('Powered by Canonical Anbox Cloud', style: TextStyle(color: Colors.white54))
+            ),
+            height: 40.0,
+          ),
         );
       }
     );
