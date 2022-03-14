@@ -69,6 +69,8 @@ while [ -n "$1" ]; do
     esac
 done
 
+set -x
+
 generate_config_file() {
   local gateway_address="$1"
   # Due to a bug(AC-777), use the juju command to create a gateway token
