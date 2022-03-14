@@ -96,6 +96,10 @@ class _MainPageState extends State<MainPage> {
               Map<String, dynamic> options = {
                 'targetElement': 'anbox-cloud-stream',
                 'fullscreen': true,
+                'screen': {
+                  'width': 1280,
+                  'height': 720
+                },
                 'connector': {
                   'connect': () { return sessionInfo; },
                   'disconnect': () {}
