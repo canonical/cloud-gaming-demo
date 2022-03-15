@@ -45,6 +45,13 @@ your Anbox Cloud Appliance by running the following commands
 
 Afterwards all configuration and the cloud gaming demo itself is removed from the machine.
 
+## Used games
+
+The demo uses the following games:
+
+ * [BombSquad](http://www.bombsquadgame.com/)
+ * [Mindustry](https://github.com/Anuken/Mindustry)
+
 ## Get help & community
 
 If you get stuck deploying the demo or would like some help with Anbox Cloud in general, come and ask on the [Anbox Cloud discourse forum](https://discourse.ubuntu.com/c/anbox-cloud)!
