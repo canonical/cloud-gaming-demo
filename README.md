@@ -45,6 +45,36 @@ your Anbox Cloud Appliance by running the following commands
 
 Afterwards all configuration and the cloud gaming demo itself is removed from the machine.
 
+## Secure access via HTTP basic auth
+
+By default the demo is exposed without access control. However you can easily add HTTP basic auth by changing
+the [traefik](https://traefik.io/) configuration at `/var/snap/anbox-cloud-appliance/common/traefik/conf/cloud-gaming-demo.yaml`
+by adding a HTTP basic auth middleware definition (see [here](https://doc.traefik.io/traefik/v2.0/middlewares/basicauth/)
+for more details).
+
+First we have to use the `htpasswd` tool to generate a user/password combination
+
+    apt install -y apache2-utils
+    httpasswd -n <your user name>
+
+On the prompt enter your desired password. The printed user/hashed password combination can now be
+inserted into the traefik configuration. For that open `/var/snap/anbox-cloud-appliance/common/traefik/conf/cloud-gaming-demo.yaml`
+in an editor and change the configuration to look like:
+
+    http:
+    routers:
+        ...
+        middlewares: ["ratelimiter", "strip-demo-prefix", "demo-auth"]
+    middlewares:
+        ...
+        demo-auth:
+            basicAuth:
+                users:
+                - "<user name>:<hashed password>"
+    ...
+
+Afterwards every user will be asked for username and password when accessing the demo site.
+
 ## Used games
 
 The demo uses the following games:
