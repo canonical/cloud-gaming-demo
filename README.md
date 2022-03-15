@@ -75,6 +75,20 @@ in an editor and change the configuration to look like:
 
 Afterwards every user will be asked for username and password when accessing the demo site.
 
+## Build
+
+If you want to build the [snap package](https://snapcraft.io) including the demo UI and service yourself
+you first have to install the [snapcraft](https://snapcraft.io) build tool. Please find further details
+[here](https://snapcraft.io/docs/snapcraft-overview)
+
+Once you have snapcraft installed all you have to do is running the following command:
+
+    snapcraft
+
+This will start the build process and procude a `.snap` package at the end which you can install with
+
+    snap install --dangerous cloud-gaming-demo*.snap
+
 ## Used games
 
 The demo uses the following games:
