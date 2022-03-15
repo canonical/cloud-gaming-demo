@@ -15,6 +15,8 @@ It also takes care of launching the actual streaming sessions on demand.
 
 Inside the web UI, the user can choose from the list of available games and start playing either of them.
 
+![Cloud Gaming Demo UI](docs/screenshot.png)
+
 ## Install
 
 To run the demo, simply complete the following steps:
