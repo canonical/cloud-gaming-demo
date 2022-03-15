@@ -15,7 +15,7 @@ It also takes care of launching the actual streaming sessions on demand.
 
 Inside the web UI, the user can choose from the list of available games and start playing either of them.
 
-## Quick start
+## Install
 
 To run the demo, simply complete the following steps:
 
@@ -32,6 +32,16 @@ The installation takes some time because it fetches and installs a selection of 
 game titles.
 
 At the end, the installation script prints the URL where you can access the demo. Happy gaming!
+
+## Uninstall
+
+In case that you don't want to use the cloud gaming demo any longer you can simply uninstall it from
+your Anbox Cloud Appliance by running the following commands
+
+    cd cloud-gaming-demo
+    sudo ./uninstall.sh
+
+Afterwards all configuration and the cloud gaming demo itself is removed from the machine.
 
 ## Get help & community
 
