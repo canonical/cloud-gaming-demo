@@ -17,7 +17,7 @@ Inside the web UI, the user can choose from the list of available games and star
 
 ![Cloud Gaming Demo UI](docs/screenshot.png)
 
-## Install
+## How to install
 
 To run the demo, simply complete the following steps:
 
@@ -35,31 +35,27 @@ game titles.
 
 At the end, the installation script prints the URL where you can access the demo. Happy gaming!
 
-## Uninstall
+## How to uninstall
 
-In case that you don't want to use the cloud gaming demo any longer you can simply uninstall it from
-your Anbox Cloud Appliance by running the following commands
+If you don't want to use the cloud gaming demo any longer, simply uninstall it from
+your Anbox Cloud Appliance by running the following commands:
 
     cd cloud-gaming-demo
     sudo ./uninstall.sh
 
-Afterwards all configuration and the cloud gaming demo itself is removed from the machine.
+This script removes the cloud gaming demo and all its configuration from the machine.
 
 ## Secure access via HTTP basic auth
 
-By default the demo is exposed without access control. However you can easily add HTTP basic auth by changing
-the [traefik](https://traefik.io/) configuration at `/var/snap/anbox-cloud-appliance/common/traefik/conf/cloud-gaming-demo.yaml`
-by adding a HTTP basic auth middleware definition (see [here](https://doc.traefik.io/traefik/v2.0/middlewares/basicauth/)
-for more details).
+By default, the demo is exposed without access control. However, you can easily add basic HTTP authentication by adding a middleware definition (see [BasicAuth](https://doc.traefik.io/traefik/v2.0/middlewares/basicauth/) for more details) to the [traefik](https://traefik.io/) configuration at `/var/snap/anbox-cloud-appliance/common/traefik/conf/cloud-gaming-demo.yaml`.
 
-First we have to use the `htpasswd` tool to generate a user/password combination
+First, use the `htpasswd` tool to generate a user/password combination:
 
     apt install -y apache2-utils
     httpasswd -n <your user name>
 
-On the prompt enter your desired password. The printed user/hashed password combination can now be
-inserted into the traefik configuration. For that open `/var/snap/anbox-cloud-appliance/common/traefik/conf/cloud-gaming-demo.yaml`
-in an editor and change the configuration to look like:
+Enter your desired password when prompted. Then insert the printed user/hashed password combination into the traefik configuration by opening `/var/snap/anbox-cloud-appliance/common/traefik/conf/cloud-gaming-demo.yaml`
+in an editor and changing the configuration to look like:
 
     http:
     routers:
@@ -73,25 +69,24 @@ in an editor and change the configuration to look like:
                 - "<user name>:<hashed password>"
     ...
 
-Afterwards every user will be asked for username and password when accessing the demo site.
+Afterwards, every user will be asked for a user name and password when accessing the demo site.
 
-## Build
+## How to build a snap
 
-If you want to build the [snap package](https://snapcraft.io) including the demo UI and service yourself
-you first have to install the [snapcraft](https://snapcraft.io) build tool. Please find further details
-[here](https://snapcraft.io/docs/snapcraft-overview)
+If you want to build the [snap package](https://snapcraft.io) including the demo UI and service yourself,
+install the [snapcraft](https://snapcraft.io) build tool. See the [Snapcraft documentation](https://snapcraft.io/docs/snapcraft-overview) for instructions.
 
-Once you have snapcraft installed all you have to do is running the following command:
+When you have snapcraft installed, run the following command in the root directory of the repository to build the snap:
 
     snapcraft
 
-This will start the build process and procude a `.snap` package at the end which you can install with
+This will start the build process and produce a `.snap` package that you can install with the following command:
 
     snap install --dangerous cloud-gaming-demo*.snap
 
 ## Used games
 
-The demo uses the following games:
+The demo currently uses the following games:
 
  * [BombSquad](http://www.bombsquadgame.com/)
  * [Mindustry](https://github.com/Anuken/Mindustry)
