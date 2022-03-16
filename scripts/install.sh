@@ -26,6 +26,7 @@ if ! snap list | grep -q anbox-cloud-appliance; then
 fi
 
 LOCAL_SNAP=
+MANIFEST=
 CHANNEL=latest/stable
 SERVICE_NAME=cloud-gaming-demo
 DEMO_SNAP_COMMON_DIR="/var/snap/cloud-gaming-demo/common"
@@ -44,9 +45,17 @@ print_help() {
     echo "arguments:"
     echo " --local-snap=<string>             Path to the local snap for cloud gaming demo installation"
     echo " --channel=<string>                Channel the snap to track and be installed from the store"
+    echo " --manifest=<string>               Path to the manifest file"
+    echo "                                   The manifest file contians information like addtional games that a user"
+    echo "                                   wants to install to cloud gaming demo besides the default ones."
+    echo "                                   example: "
+    echo "                                   $ cat manifest.yaml "
+    echo "                                   games:              "
+    echo "                                     foo:                 # Name to the game "
+    echo "                                       arch: 'universal'  # Architecture for the game APK (universal|amd64|arm64)"
+    echo "                                       source: app.apk    # Source to the game APK, either a local file path or a URL that the APK can be downloaded from"
     echo " -h|--help                         Show help"
 }
-
 
 while [ -n "$1" ]; do
     case "$1" in
@@ -56,6 +65,10 @@ while [ -n "$1" ]; do
             ;;
         --channel=*)
             CHANNEL=${1#*=}
+            shift
+            ;;
+        --manifest=*)
+            MANIFEST=${1#*=}
             shift
             ;;
         -h|--help)
@@ -88,6 +101,14 @@ EOF
   chmod -R 0600 "${service_folder}/config.yaml"
 }
 
+game_instance_type() {
+  local instance_type="g4.3"
+  if sudo -u ubuntu amc node show lxd0 | grep -q "gpus: {}"; then
+    instance_type="a4.3"
+  fi
+  echo "${instance_type}"
+}
+
 install_snap() {
   local channel=$1
   local snap_path=$2
@@ -105,46 +126,77 @@ install_snap() {
   fi
 }
 
-install_games() {
+install_game() {
   local work_dir=$1
-  local instance_type="g4.3"
-  if sudo -u ubuntu amc node show lxd0 | grep "gpus: {}" > /dev/null; then
-    instance_type="a4.3"
+  local game=$2
+  local instance_type=$3
+  local arch=$4
+  local source=$5
+
+  if sudo -u ubuntu amc application ls | grep "${game}.*ready"; then
+    echo "$game" >> "${work_dir}/.installed_games"
+    return;
   fi
 
-  chown -R ubuntu:ubuntu "${work_dir}"
+  local host_arch=$(dpkg-architecture -qDEB_HOST_ARCH)
+  if [ "${arch}" != "universal" ] &&
+       [ "${arch}" != "$host_arch" ] ; then
+    return;
+  fi
 
-  host_arch=$(dpkg-architecture -qDEB_HOST_ARCH)
+  local app_dir="${work_dir}/${game}"
+  mkdir -p "${app_dir}" && chown -R ubuntu:ubuntu "${work_dir}"
+  if [ -f $source ]; then
+    cp "${source}" "${app_dir}/app.apk"
+  else
+    wget "${source}" -O "${app_dir}/app.apk"
+  fi
+
+  cat << EOF > "${app_dir}"/manifest.yaml
+name: $game
+instance-type: $instance_type
+EOF
+  chown -R ubuntu:ubuntu "${app_dir}"
+  sudo -u ubuntu amc application create "${app_dir}"
+  sudo -u ubuntu amc wait -c status=ready "${game}"
+
+  echo "$game" >> "${work_dir}/.installed_games"
+}
+
+install_default_games() {
+  local work_dir=$1
+  local instance_type=$2
+
   # Do not install the application in parallel since we may run the risk for
   # application installation and fail the entire installation process due to
   # lack of system resources for AMS to create base containers if the appliance
   # is installed in a small instance.
   for game in ${GAMES[@]}; do
     echo "Installing $game..."
-    if sudo -u ubuntu amc application ls | grep "${game}.*ready"; then
-      echo "$game" >> "${work_dir}/.installed_games"
-      continue;
-    fi
-
     local pkg_arch="${game^^}_PKG_ARCH"
-    if [ "${!pkg_arch}" != "universal" ] &&
-         [ "${!pkg_arch}" != "$host_arch" ] ; then
-      continue;
-    fi
+    local pkg_source="${game^^}_DOWNLOAD_URL"
+    install_game "${work_dir}" "${game}" "${instance_type}" "${!pkg_arch}" "${!pkg_source}"
+  done
+}
 
-    local app_dir="${work_dir}/${game}"
-    mkdir -p "${app_dir}" && chown -R ubuntu:ubuntu "${work_dir}"
-    local download_url="${game^^}_DOWNLOAD_URL"
-    wget "${!download_url}" -O "${app_dir}/app.apk"
-    cat << EOF > "${app_dir}"/manifest.yaml
-name: $game
-instance-type: $instance_type
-EOF
-    chown -R ubuntu:ubuntu "${app_dir}"
-    sudo -u ubuntu amc application create "${app_dir}"
-    sudo -u ubuntu amc wait -c status=ready "${game}"
+install_custom_games() {
+  local work_dir=$1
+  local instance_type=$2
+  local manifest=$3
 
-    echo "$game" >> "${work_dir}/.installed_games"
+  if [ -z "${manifest}" ] || [ ! -e "${manifest}" ]; then
+    return
+  fi
+
+  if ! snap list | grep -q yq; then
+    snap install yq
+  fi
+
+  local games=$(cat "${manifest}" | yq '.games | keys | .[]')
+  for game in $games ; do
+    pkg_arch=$(cat "${manifest}" | yq ".games.$game.arch")
+    pkg_source=$(cat "${manifest}" | yq ".games.$game.source")
+    install_game "${work_dir}" "${game}" "${instance_type}" "${pkg_arch}" "${pkg_source}"
   done
 }
 
@@ -224,14 +276,19 @@ EOF
 }
 
 work_dir=$(mktemp -p "$PWD" -d app.XXXXXXX)
+chown -R ubuntu:ubuntu "${work_dir}"
 trap "rm -fr $work_dir" EXIT INT
+
+instance_type=$(game_instance_type)
 
 eval "$(anbox-cloud-appliance internal generate-cloud-info)"
 demo_address="0.0.0.0:8002"
 
 install_snap "${CHANNEL}" "${LOCAL_SNAP}"
 
-install_games "${work_dir}"
+install_default_games "${work_dir}" "${instance_type}"
+
+install_custom_games "${work_dir}" "${instance_type}" "${MANIFEST}"
 
 generate_config_file "${CLOUD_PUBLIC_LOCATION}"
 
