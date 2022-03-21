@@ -19,14 +19,16 @@ class Application {
     'bbr2': 'Join the Beach Buggy Racing League and compete against drivers and cars from around the world. Race through Egyptian pyramids, dragon-infested castles, pirate ship wrecks, and experimental alien bio-labs. Collect and upgrade an arsenal of fun and wacky Powerups. Recruit new drivers, assemble a garage full of cars and race your way to the top of the League.',
     'bombsquad': 'Blow up your friends in mini-games ranging from capture-the-flag to hockey! Featuring 8 player local/networked multiplayer, gratuitous explosions, advanced ragdoll face-plant physics, pirates, ninjas, barbarians, insane chefs, and more.',
     'mindustry': 'Mindustry is a hybrid tower-defense sandbox factory game. Create elaborate supply chains of conveyor belts to feed ammo into your turrets, produce materials to use for building, and defend your structures from waves of enemies.',
-    'minetest': 'An open source voxel game engine. Play one of our many games, mod a game to your liking, make your own game, or play on a multiplayer server.'
+    'minetest': 'An open source voxel game engine. Play one of our many games, mod a game to your liking, make your own game, or play on a multiplayer server.',
+    'drarm': 'A in-house Arm gaming production - "Amazing Adventures of Dr. Arm" - is a medieval action-adventure role-playing AAA game where the player fights zombies, skeletons, and wraiths. "Dr. Arm" hails from the Mali Manga comics that Arm published for game developers to explain the inner workings of mobile GPUs in manga form.',
   };
 
   static Map<String, String> appNameMap = const {
     'bbr2': 'Beach Buggy Racing 2',
     'bombsquad': 'BombSquad',
     'mindustry': 'Mindustry',
-    'minetest': 'Minetest'
+    'minetest': 'Minetest',
+    'drarm': 'Dr. Arm',
   };
 
   String id = '';
