@@ -73,16 +73,13 @@ set -x
 
 generate_config_file() {
   local gateway_address="$1"
-  # Due to a bug(AC-777), use the juju command to create a gateway token
-  # rather than using anbox-cloud-appliance.
-  local token=$(sudo -u ubuntu juju ssh -m appliance:anbox-cloud anbox-stream-gateway/0 \
-                -- "sudo /snap/bin/anbox-stream-gateway account create cloud-gaming-demo-$(date +%s)")
+  local gateway_token="$(sudo -u ubuntu anbox-cloud-appliance gateway account create cloud-gaming-demo-$(date +%s))"
 
   local service_folder="${DEMO_SNAP_COMMON_DIR}/service"
   mkdir -p "${service_folder}" && chmod 0750 "${service_folder}"
   cat << EOF > "${service_folder}/config.yaml"
 gateway-url: https://${gateway_address}
-gateway-token: ${token}
+gateway-token: ${gateway_token}
 EOF
 
   chmod -R 0600 "${service_folder}/config.yaml"
