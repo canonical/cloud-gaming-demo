@@ -32,7 +32,7 @@ DEMO_SNAP_COMMON_DIR="/var/snap/cloud-gaming-demo/common"
 APPLIANCE_SNAP_COMMON_DIR="/var/snap/anbox-cloud-appliance/common"
 
 GAMES="bombsquad mindustry"
-BOMBSQUAD_DOWNLOAD_URL="https://files.ballistica.net/bombsquad/builds/BombSquad_Android_Generic_1.6.10.apk"
+BOMBSQUAD_DOWNLOAD_URL="https://files.ballistica.net/bombsquad/builds/BombSquad_Android_Generic_1.7.1.apk"
 BOMBSQUAD_PKG_ARCH="universal"
 MINDUSTRY_DOWNLOAD_URL="https://f-droid.org/repo/io.anuke.mindustry_104.apk"
 MINDUSTRY_PKG_ARCH="universal"
