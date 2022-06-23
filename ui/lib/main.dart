@@ -95,7 +95,6 @@ class _MainPageState extends State<MainPage> {
             createSession(game).then((JsObject sessionInfo) {
               Map<String, dynamic> options = {
                 'targetElement': 'anbox-cloud-stream',
-                'fullscreen': true,
                 'screen': {
                   'width': 1280,
                   'height': 720
@@ -107,21 +106,22 @@ class _MainPageState extends State<MainPage> {
               };
 
               var stream = JsObject(context['AnboxStream'], [JsObject.jsify(options)]);
-              stream.callMethod('connect', []);
-              stream.callMethod('requestFullscreen', []);
-
               void fullScreenChangedCallback(JsObject ev) {
                 var doc = JsObject.fromBrowserObject(context['document']);
                 if(!doc['webkitIsFullScreen'] &&
                    !doc['fullscreenchange'] &&
-                   !doc['mozfullscreenchange']){
+                   !doc['mozfullscreenchange'] &&
+                   !doc['fullscreenElement']){
                     stream.callMethod('disconnect', []);
+                } else {
+                    stream.callMethod('connect', []);
                 }
               }
 
               var cb = allowInterop(fullScreenChangedCallback);
               var window = JsObject.fromBrowserObject(context['window']);
               window.callMethod('addEventListener', ['fullscreenchange', cb]);
+              stream.callMethod('_requestFullscreen', []);
             }).catchError((e) {
               final scaffold = ScaffoldMessenger.of(buildContext);
               scaffold.showSnackBar(
