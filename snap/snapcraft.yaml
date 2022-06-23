@@ -53,6 +53,8 @@ parts:
     after: [ service ]
     flutter-target: lib/main.dart
     override-build: |
+      # To bypass the proxy setup and build the snap on launchpad
+      export no_proxy=127.0.0.1
       flutter build web --base-href '/demo/'
       mkdir -p $SNAPCRAFT_PART_INSTALL/service/static
       cp -r build/web/* $SNAPCRAFT_PART_INSTALL/service/static
